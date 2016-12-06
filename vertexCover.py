@@ -3,7 +3,7 @@
 from random import randint
 
 def getInputValues():
-    with open('graph.txt') as file:
+    with open('graph2.txt') as file:
         while True:
             # Read the current character
             curChar = file.read(1)
