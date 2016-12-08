@@ -1,10 +1,11 @@
 #!/bin/python
 
+import sys
 from random import randint
 import glpk
 
 def getInputValues():
-    with open('graph.txt') as file:
+    with open(sys.argv[1]) as file:
         while True:
             # Read the current character
             curChar = file.read(1)
@@ -144,6 +145,15 @@ def findVertexCover():
                 del edgeEndpoints2[vertexIndex]
             except Exception, e:
                 break
+
+# Ensure we have enough arguments
+if len(sys.argv) < 2:
+    print("Not enough arguments. Command is python vertexCover.py yourGraph.txt")
+    sys.exit()
+
+if len(sys.argv) > 2:
+    print("Too many arguments. Command is python vertexCover.py yourGraph.txt")
+    sys.exit()
 
 # Variable declarations
 vertices = []

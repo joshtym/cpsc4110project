@@ -12,3 +12,5 @@ etc.
 For the sake of simplicity, please number the verticies 1 - n where you have n verticies and don't pick random symbols to represent the vertices.
 
 **Output** : A minimal vertex covering such that every edge is connected to one of the 'picked' vertices.
+
+Command is : python vertexCover.py yourGraph.txt
