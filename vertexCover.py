@@ -1,9 +1,10 @@
 #!/bin/python
 
 from random import randint
+import glpk
 
 def getInputValues():
-    with open('graph2.txt') as file:
+    with open('graph.txt') as file:
         while True:
             # Read the current character
             curChar = file.read(1)
@@ -41,6 +42,55 @@ def getInputValues():
 
             # Append the endpoint
             edgeEndpoints2.append(temp)
+
+def fillLinearProgramCredentials():
+    # Create our Linear Program. Vertex Cover is a minimizing problem
+    lp = glpk.LPX()
+    lp.name = "Unweighted Vertex Cover Problem"
+    lp.obj.maximize = False
+    lp.rows.add(len(edgeEndpoints1))
+
+    # Set the bounded constraints
+    for r in lp.rows:
+       lp.rows[r.index].bounds = 1.0, None
+
+    # Add in our vertices and create the lower bound for the relaxation
+    lp.cols.add(len(vertices))
+    for c in lp.cols:
+        c.name = 'x%d' % (c.index + 1)
+        c.bounds = 0.0, None
+
+    # Create our objective function 
+    temp = []
+    for vertex in vertices:
+        temp.append(1.0)
+    lp.obj[:] = temp
+
+    # Reset temp and fill in our constraint matrix
+    temp = []
+    i = 0
+    while i != len(vertices) * len(edgeEndpoints1):
+        temp.append(0)
+        i += 1
+    i = 0
+    while i != len(edgeEndpoints1):
+        temp[(len(vertices) * i) + (int(edgeEndpoints1[i]) - 1)] = 1
+        temp[(len(vertices) * i) + (int(edgeEndpoints2[i]) - 1)] = 1
+        i += 1
+
+    # Set our constraint matrix
+    lp.matrix = temp
+
+    # Solve using the simplex method
+    lp.simplex()
+
+    # Print out our results
+    print('Optimal Number of Vertices from Linear Program = ' + str(int(lp.obj.value)))
+    print("Linear Program Vertices Chosen are:"),
+    for c in lp.cols:
+        if c.primal == 1:
+            print(c.name + ','),
+    print('')
 
 def findVertexCover():
     while True:
@@ -103,8 +153,8 @@ verticesChosen = []
 
 # Get our input values
 getInputValues()
+fillLinearProgramCredentials()
 findVertexCover()
 
 # Print our chosen vertices
-print("Vertices chosen are: " + ', '.join(verticesChosen))
-    
+print("Vertices chosen by Greedy are: " + ', '.join(verticesChosen))
